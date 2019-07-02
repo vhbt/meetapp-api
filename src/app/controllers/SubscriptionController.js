@@ -1,7 +1,10 @@
 import { Op } from 'sequelize';
-import { isBefore, parseISO } from 'date-fns';
 import Meetup from '../models/Meetup';
 import Subscription from '../models/Subscription';
+import User from '../models/User';
+
+import SubscriptionMail from '../jobs/SubscriptionMail';
+import Queue from '../../lib/Queue';
 
 class SubscriptionController {
   async index(req, res) {
@@ -26,10 +29,12 @@ class SubscriptionController {
   }
 
   async store(req, res) {
-    const { id } = req.params;
-    const meetup = await Meetup.findOne({
-      where: {
-        id,
+    const user = await User.findByPk(req.userId);
+    const meetup = await Meetup.findByPk(req.params.id, {
+      include: {
+        model: User,
+        as: 'user',
+        attributes: ['name', 'email'],
       },
     });
 
@@ -49,7 +54,7 @@ class SubscriptionController {
 
     const subscribed = await Subscription.findOne({
       where: {
-        user_id: req.userId,
+        user_id: user.id,
         meetup_id: meetup.id,
       },
     });
@@ -62,7 +67,7 @@ class SubscriptionController {
 
     const checkDate = await Subscription.findOne({
       where: {
-        user_id: req.userId,
+        user_id: user.id,
       },
       include: [
         {
@@ -82,8 +87,13 @@ class SubscriptionController {
     }
 
     const subscription = await Subscription.create({
-      user_id: req.userId,
+      user_id: user.id,
       meetup_id: meetup.id,
+    });
+
+    await Queue.add(SubscriptionMail.key, {
+      meetup,
+      user,
     });
 
     return res.json(subscription);

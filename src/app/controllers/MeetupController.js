@@ -1,3 +1,4 @@
+import * as Yup from 'yup';
 import { isBefore, startOfDay, endOfDay, parseISO } from 'date-fns';
 import { Op } from 'sequelize';
 import Meetup from '../models/Meetup';
@@ -35,6 +36,22 @@ class MeetupController {
   }
 
   async store(req, res) {
+    const validationSchema = Yup.object().shape({
+      title: Yup.string().required('Title can not be empty.'),
+      description: Yup.string().required('Description can not be empty.'),
+      location: Yup.string().required('Location can not be empty.'),
+      date: Yup.date().required('Date can not be empty.'),
+      banner: Yup.number().required('Banner can not be empty.'),
+    });
+
+    try {
+      await validationSchema.validate(req.body, {
+        abortEarly: false,
+      });
+    } catch (err) {
+      return res.status(400).json({ error: err.errors });
+    }
+
     const { title, description, location, date, banner_id } = req.body;
 
     if (isBefore(parseISO(date), new Date())) {
@@ -58,6 +75,22 @@ class MeetupController {
   }
 
   async update(req, res) {
+    const validationSchema = Yup.object().shape({
+      title: Yup.string(),
+      description: Yup.string(),
+      location: Yup.string(),
+      date: Yup.date(),
+      banner: Yup.number(),
+    });
+
+    try {
+      await validationSchema.validate(req.body, {
+        abortEarly: false,
+      });
+    } catch (err) {
+      return res.status(400).json({ error: err.errors });
+    }
+
     const { title, description, location, date, banner_id } = req.body;
 
     const meetup = await Meetup.findOne({
