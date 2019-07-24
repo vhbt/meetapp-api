@@ -41,7 +41,7 @@ class MeetupController {
       description: Yup.string().required('Description can not be empty.'),
       location: Yup.string().required('Location can not be empty.'),
       date: Yup.date().required('Date can not be empty.'),
-      banner: Yup.number().required('Banner can not be empty.'),
+      banner: Yup.number(),
     });
 
     try {
@@ -72,6 +72,34 @@ class MeetupController {
     });
 
     return res.json(meetup);
+  }
+
+  async view(req, res) {
+    const validationSchema = Yup.object().shape({
+      id: Yup.number().required(),
+    });
+
+    try {
+      await validationSchema.validate(req.params, {
+        abortEarly: false,
+      });
+    } catch (err) {
+      return res.status(400).json({ error: err.errors });
+    }
+
+    const { id } = req.params;
+
+    const meetup = await Meetup.findOne({
+      where: {
+        id: req.params.id,
+      },
+    });
+
+    if (!meetup) {
+      return res.status(401).json({ error: 'Meetup does not exist.' });
+    }
+
+    return res.json(meetup)
   }
 
   async update(req, res) {

@@ -38,8 +38,10 @@ class UserController {
 
   async update(req, res) {
     const validationSchema = Yup.object().shape({
-      name: Yup.string(),
-      email: Yup.string().email('Email must be a valid email.'),
+      name: Yup.string().required(),
+      email: Yup.string()
+        .email('Email must be a valid email.')
+        .required(),
       oldPassword: Yup.string()
         .min(6, 'Old password must be > 6 characters.')
         .when('password', (password, field) =>
