@@ -3,6 +3,7 @@ import { isBefore, startOfDay, endOfDay, parseISO } from 'date-fns';
 import { Op } from 'sequelize';
 import Meetup from '../models/Meetup';
 import User from '../models/User';
+import File from '../models/File';
 
 class MeetupController {
   async index(req, res) {
@@ -33,6 +34,50 @@ class MeetupController {
     });
 
     return res.json(meetups);
+  }
+
+  async view(req, res) {
+    const validationSchema = Yup.object().shape({
+      id: Yup.number().required(),
+    });
+
+    try {
+      await validationSchema.validate(req.params, {
+        abortEarly: false,
+      });
+    } catch (err) {
+      return res.status(400).json({ error: err.errors });
+    }
+
+    const { id } = req.params;
+
+    const meetup = await Meetup.findOne({
+      where: {
+        id,
+      },
+      attributes: [
+        'past',
+        'id',
+        'title',
+        'description',
+        'location',
+        'date',
+        'user_id',
+      ],
+      include: [
+        {
+          model: File,
+          as: 'banner',
+          attributes: ['id', 'path', 'url'],
+        },
+      ],
+    });
+
+    if (!meetup) {
+      return res.status(401).json({ error: 'Meetup does not exist.' });
+    }
+
+    return res.json(meetup);
   }
 
   async store(req, res) {
@@ -74,41 +119,13 @@ class MeetupController {
     return res.json(meetup);
   }
 
-  async view(req, res) {
-    const validationSchema = Yup.object().shape({
-      id: Yup.number().required(),
-    });
-
-    try {
-      await validationSchema.validate(req.params, {
-        abortEarly: false,
-      });
-    } catch (err) {
-      return res.status(400).json({ error: err.errors });
-    }
-
-    const { id } = req.params;
-
-    const meetup = await Meetup.findOne({
-      where: {
-        id: req.params.id,
-      },
-    });
-
-    if (!meetup) {
-      return res.status(401).json({ error: 'Meetup does not exist.' });
-    }
-
-    return res.json(meetup)
-  }
-
   async update(req, res) {
     const validationSchema = Yup.object().shape({
       title: Yup.string(),
       description: Yup.string(),
       location: Yup.string(),
       date: Yup.date(),
-      banner: Yup.number(),
+      banner_id: Yup.number(),
     });
 
     try {
