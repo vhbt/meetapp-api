@@ -86,7 +86,7 @@ class MeetupController {
       description: Yup.string().required('Description can not be empty.'),
       location: Yup.string().required('Location can not be empty.'),
       date: Yup.date().required('Date can not be empty.'),
-      banner: Yup.number(),
+      banner_id: Yup.number().required('You must set a banner for the meetup.'),
     });
 
     try {
