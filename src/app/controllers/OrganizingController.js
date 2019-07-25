@@ -15,7 +15,7 @@ class OrganizingController {
           attributes: ['path', 'url'],
         },
       ],
-      order: ['date'],
+      order: [['date', 'DESC']],
     });
 
     return res.json(meetups);
