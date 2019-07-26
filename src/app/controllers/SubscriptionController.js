@@ -39,7 +39,7 @@ class SubscriptionController {
     });
 
     if (!meetup) {
-      return res.status(401).json({ error: 'Meetup doe  s not exist.' });
+      return res.status(401).json({ error: 'Meetup does not exist.' });
     }
 
     if (req.userId === meetup.user_id) {
