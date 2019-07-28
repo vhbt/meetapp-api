@@ -269,7 +269,7 @@ describe('Meetup', () => {
 
     // create file
     const file = await request(app)
-      .post('/files')
+      .post('/banner')
       .set('Authorization', `Bearer ${token}`)
       .attach('file', path.resolve(__dirname, '..', 'banner.jpeg'));
 
