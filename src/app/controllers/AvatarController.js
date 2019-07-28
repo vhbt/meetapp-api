@@ -1,6 +1,6 @@
 import File from '../models/File';
 
-class FileController {
+class BannerController {
   async store(req, res) {
     const { originalname: name, filename: path } = req.file;
 
@@ -13,4 +13,4 @@ class FileController {
   }
 }
 
-export default new FileController();
+export default new BannerController();

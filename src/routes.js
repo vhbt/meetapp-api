@@ -7,9 +7,10 @@ import SessionController from './app/controllers/SessionController';
 import MeetupController from './app/controllers/MeetupController';
 import OrganizingController from './app/controllers/OrganizingController';
 import SubscriptionController from './app/controllers/SubscriptionController';
+import BannerController from './app/controllers/BannerController';
+import AvatarController from './app/controllers/AvatarController';
 
 import authMiddleware from './app/middlewares/auth';
-import FileController from './app/controllers/FileController';
 
 const routes = new Router();
 const upload = multer(multerConfig);
@@ -19,7 +20,8 @@ routes.post('/sessions', SessionController.store);
 
 routes.use(authMiddleware);
 
-routes.post('/files', upload.single('file'), FileController.store);
+routes.post('/banner', upload.single('file'), BannerController.store);
+routes.post('/avatar', upload.single('file'), AvatarController.store);
 
 routes.put('/users', UserController.update);
 

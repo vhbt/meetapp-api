@@ -9,6 +9,7 @@ class User extends Model {
         email: Sequelize.STRING,
         password: Sequelize.VIRTUAL,
         password_hash: Sequelize.STRING,
+        avatar_id: Sequelize.INTEGER,
       },
       {
         sequelize,
@@ -27,6 +28,11 @@ class User extends Model {
   static associate(models) {
     this.hasMany(models.Meetup);
     this.hasMany(models.Subscription);
+    this.hasOne(models.File, {
+      foreignKey: 'id',
+      sourceKey: 'avatar_id',
+      as: 'avatar',
+    });
   }
 
   checkPassword(password) {
