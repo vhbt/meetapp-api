@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { promisify } from 'util';
+import * as Sentry from '@sentry/node';
 
 import authConfig from '../../config/auth';
 
@@ -16,6 +17,10 @@ export default async (req, res, next) => {
     const decoded = await promisify(jwt.verify)(token, authConfig.secret);
 
     req.userId = decoded.id;
+
+    Sentry.configureScope(scope => {
+      scope.setUser({ id: req.userId });
+    });
 
     return next();
   } catch (err) {
