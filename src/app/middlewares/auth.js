@@ -16,6 +16,8 @@ export default async (req, res, next) => {
   try {
     const decoded = await promisify(jwt.verify)(token, authConfig.secret);
 
+    if (decoded.exp < Date.now() / 1000) throw new Error();
+
     req.userId = decoded.id;
 
     Sentry.configureScope(scope => {
