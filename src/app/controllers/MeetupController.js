@@ -10,6 +10,7 @@ class MeetupController {
   async index(req, res) {
     const where = {};
     const page = req.query.page || 1;
+    const limit = req.query.limit || 10;
 
     if (req.query.date) {
       const searchDate = parseISO(req.query.date);
@@ -21,7 +22,7 @@ class MeetupController {
 
     const meetups = await Meetup.findAll({
       where,
-      limit: 10,
+      limit,
       offset: (page - 1) * 10,
       order: ['date'],
       attributes: ['past', 'id', 'title', 'description', 'location', 'date'],
@@ -30,6 +31,11 @@ class MeetupController {
           model: User,
           as: 'user',
           attributes: ['id', 'name'],
+        },
+        {
+          model: File,
+          as: 'banner',
+          attributes: ['id', 'path', 'url'],
         },
       ],
     });
