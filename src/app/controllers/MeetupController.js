@@ -8,7 +8,9 @@ import Subscription from '../models/Subscription';
 
 class MeetupController {
   async index(req, res) {
-    const where = {};
+    const where = {
+      cancelled: false,
+    };
     const page = req.query.page || 1;
     const limit = req.query.limit || 10;
 
@@ -25,7 +27,16 @@ class MeetupController {
       limit,
       offset: (page - 1) * 10,
       order: ['date'],
-      attributes: ['past', 'id', 'title', 'description', 'location', 'date'],
+      attributes: [
+        'past',
+        'id',
+        'title',
+        'description',
+        'location',
+        'date',
+        'canceled_at',
+        'canceled',
+      ],
       include: [
         {
           model: User,
@@ -58,6 +69,8 @@ class MeetupController {
         'location',
         'date',
         'user_id',
+        'canceled_at',
+        'canceled',
       ],
       include: [
         {
@@ -163,7 +176,9 @@ class MeetupController {
         .json({ error: 'You can not delete meetups that already happened.' });
     }
 
-    meetup.destroy();
+    meetup.update({
+      canceled_at: new Date(),
+    });
 
     return res.json(meetup);
   }

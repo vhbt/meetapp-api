@@ -15,6 +15,15 @@ class Meetup extends Model {
             return isBefore(this.date, new Date());
           },
         },
+        canceled_at: {
+          type: Sequelize.DATE,
+        },
+        canceled: {
+          type: Sequelize.VIRTUAL,
+          get() {
+            return this.canceled_at !== null;
+          },
+        },
       },
       {
         sequelize,
