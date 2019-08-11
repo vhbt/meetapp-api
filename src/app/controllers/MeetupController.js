@@ -9,7 +9,7 @@ import Subscription from '../models/Subscription';
 class MeetupController {
   async index(req, res) {
     const where = {
-      cancelled: false,
+      canceled_at: null,
     };
     const page = req.query.page || 1;
     const limit = req.query.limit || 10;
