@@ -1,5 +1,5 @@
 import { isBefore, startOfDay, endOfDay, parseISO } from 'date-fns';
-import { Op } from 'sequelize';
+import { Op, literal } from 'sequelize';
 
 import Meetup from '../models/Meetup';
 import User from '../models/User';
@@ -12,7 +12,7 @@ class MeetupController {
       canceled_at: null,
     };
     const page = req.query.page || 1;
-    const limit = req.query.limit || 10;
+    const limit = req.query.limit || 5;
 
     if (req.query.date) {
       const searchDate = parseISO(req.query.date);
@@ -25,8 +25,12 @@ class MeetupController {
     const meetups = await Meetup.findAll({
       where,
       limit,
-      offset: (page - 1) * 10,
-      order: ['date'],
+      offset: (page - 1) * limit,
+      order: [
+        [literal('date < NOW()')],
+        ['canceled_at', 'DESC NULLS FIRST'],
+        ['date'],
+      ],
       attributes: [
         'past',
         'id',
@@ -36,20 +40,34 @@ class MeetupController {
         'date',
         'canceled_at',
         'canceled',
+        'banner_id',
       ],
       include: [
         {
           model: User,
           as: 'user',
           attributes: ['id', 'name'],
+          where: {
+            id: {
+              [Op.not]: req.userId,
+            },
+          },
         },
         {
           model: File,
           as: 'banner',
           attributes: ['id', 'path', 'url'],
         },
+        {
+          model: Subscription,
+          attributes: ['user_id'],
+        },
       ],
     });
+
+    // const data = meetups.map(meetup => ({
+    //   ...meetup,
+    // }));
 
     return res.json(meetups);
   }

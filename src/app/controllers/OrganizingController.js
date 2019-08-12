@@ -1,4 +1,4 @@
-import sequelize from 'sequelize';
+import { literal } from 'sequelize';
 import Meetup from '../models/Meetup';
 import File from '../models/File';
 
@@ -26,7 +26,7 @@ class OrganizingController {
         },
       ],
       order: [
-        [sequelize.literal('date < NOW()')],
+        [literal('date < NOW()')],
         ['canceled_at', 'DESC NULLS FIRST'],
         ['date', 'ASC'],
       ],
