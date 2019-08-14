@@ -4,7 +4,12 @@ import File from '../models/File';
 
 class OrganizingController {
   async index(req, res) {
+    const page = req.query.page || 1;
+    const limit = req.query.limit || 5;
+
     const meetups = await Meetup.findAll({
+      offset: (page - 1) * limit,
+      limit,
       where: {
         user_id: req.userId,
       },
