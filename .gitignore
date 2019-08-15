@@ -92,3 +92,5 @@ dist
 .dynamodb/
 
 tmp/*
+
+__tests__/database.sqlite
