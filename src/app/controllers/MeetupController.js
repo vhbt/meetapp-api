@@ -65,10 +65,6 @@ class MeetupController {
       ],
     });
 
-    // const data = meetups.map(meetup => ({
-    //   ...meetup,
-    // }));
-
     return res.json(meetups);
   }
 
